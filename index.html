@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>asdf</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 650px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+        input,
+        select {
+            width: 95%;
+            padding: 4px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 8px 14px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>작성 폼</h2>
+
+    <table id="form_table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>이름</th>
+                <th>진료비</th>
+                <th>카드</th>
+                <th>통장입금</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+                <td><input type="text"></td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>-</td>
+                <td>-</td>
+                <td id="sum1">0</td>
+                <td id="sum2">0</td>
+                <td id="sum3">0</td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <br>
+
+    <button onclick="addRow()">행 추가</button>
+    <button onclick="submitAll()">전체 제출</button>
+
+    <script>
+        // 폼 ID
+        const FORMID = "...";
+        // entry 번호
+        const ENTRY = {
+            name: "entry.1",
+            bill: "entry.2",
+            card: "entry.3",
+            cache: "entry.4"
+        };
+        const FORM_URL =
+            "https://docs.google.com/forms/d/e/" + FORMID + "/formResponse";
+
+        // 행 추가
+        function addRow() {
+            const tbody = document.querySelector("#form_table tbody");
+            const newRow = tbody.rows[0].cloneNode(true);
+
+            const rowNumber = tbody.rows.length + 1;
+            newRow.cells[0].innerText = rowNumber;
+
+            newRow.querySelectorAll("input").forEach((i, idx) => {
+                i.value = "";
+            });
+
+            tbody.appendChild(newRow);
+        }
+
+
+        // row 제출
+        async function submitRow(name, bill, card, cache) {
+            const data = new FormData();
+
+            data.append(ENTRY.name, name);
+            data.append(ENTRY.bill, bill);
+            data.append(ENTRY.card, card);
+            data.append(ENTRY.cache, cache);
+
+            await fetch(FORM_URL, {
+                method: "POST",
+                mode: "no-cors",
+                body: data
+            });
+        }
+
+        // 전체 제출
+        async function submitAll() {
+            if (!confirm("현재 작성된 페이지를 제출합니다.")) return;
+            const rows = document.querySelectorAll("#form_table tbody tr");
+
+            for (const row of rows) {
+                const inputs = row.querySelectorAll("input, select");
+
+                const i = 0
+                const name = inputs[i].value.trim();
+                const bill = inputs[i + 1].value.trim();
+                const card = inputs[i + 2].value.trim();
+                const cache = inputs[i + 3].value.trim();
+
+                if (!name) continue;
+
+                await submitRow(name, bill, card, cache);
+            }
+
+            alert("제출 완료");
+            location.reload();
+        }
+
+        // 합산값 계산
+        function updateSums() {
+            const tbody = document.querySelector("#form_table tbody");
+            let sum1 = 0, sum2 = 0, sum3 = 0;
+
+            tbody.querySelectorAll("tr").forEach(row => {
+                const cells = row.querySelectorAll("input");
+                sum1 += Number(cells[1].value) || 0;
+                sum2 += Number(cells[2].value) || 0;
+                sum3 += Number(cells[3].value) || 0;
+            });
+
+            document.getElementById("sum1").innerText = sum1;
+            document.getElementById("sum2").innerText = sum2;
+            document.getElementById("sum3").innerText = sum3;
+        }
+        
+        // input 변경시 updateSums
+        document.querySelector("#form_table tbody").addEventListener("input", function (e) {
+            if (e.target.tagName === "INPUT") {
+                updateSums();
+            }
+        });
+    </script>
+
+</body>
+
+</html>
