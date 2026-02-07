@@ -39,7 +39,7 @@
 </head>
 
 <body>
-    <h2>작성 폼</h2>
+    <h2 id="title">작성 폼</h2>
 
     <table id="form_table">
         <thead>
@@ -79,13 +79,13 @@
 
     <script>
         // 폼 ID
-        const FORMID = "...";
+        const FORMID = "";
         // entry 번호
         const ENTRY = {
-            name: "entry.1",
-            bill: "entry.2",
-            card: "entry.3",
-            cache: "entry.4"
+            name: "entry.",
+            bill: "entry.",
+            card: "entry.",
+            cache: "entry."
         };
         const FORM_URL =
             "https://docs.google.com/forms/d/e/" + FORMID + "/formResponse";
@@ -105,6 +105,11 @@
             tbody.appendChild(newRow);
         }
 
+        // h2 update
+        function updateh2(text) {
+            const h2 = document.getElementById("title");
+            h2.innerHTML = "업로드 중: " + text;
+        }
 
         // row 제출
         async function submitRow(name, bill, card, cache) {
@@ -124,17 +129,20 @@
 
         // 전체 제출
         async function submitAll() {
+
             if (!confirm("현재 작성된 페이지를 제출합니다.")) return;
             const rows = document.querySelectorAll("#form_table tbody tr");
 
-            for (const row of rows) {
+            for (let i = 0; i < rows.length; i++) {
+                let a = i + 1;
+                updateh2(a + "/" + rows.length);
+                const row = rows[i];
                 const inputs = row.querySelectorAll("input, select");
 
-                const i = 0
-                const name = inputs[i].value.trim();
-                const bill = inputs[i + 1].value.trim();
-                const card = inputs[i + 2].value.trim();
-                const cache = inputs[i + 3].value.trim();
+                const name = inputs[0].value.trim();
+                const bill = inputs[1].value.trim();
+                const card = inputs[2].value.trim();
+                const cache = inputs[3].value.trim();
 
                 if (!name) continue;
 
