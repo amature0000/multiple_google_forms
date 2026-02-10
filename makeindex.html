@@ -124,7 +124,7 @@
             const entryObj = {};
             cols.forEach(c => {
                 if (c.key)
-                    entryObj[c.key] = "entry.XXXXX";
+                    entryObj[c.key] = "entry." + c.key;
             });
 
             const html = `
@@ -276,13 +276,19 @@ function addRow(){
 }
 
 async function submitAll(){
+    if (!confirm("현재 작성된 페이지를 제출합니다.")) return;
     const rows=document.querySelectorAll("tbody tr");
 
     for(const row of rows){
         const data=new FormData();
+        const firstInputs = row.querySelectorAll("input")[0];
+        if(firstInputs.value == "") continue;
 
         COLUMNS.forEach((c,i)=>{
-            if(!c.key) return;
+            if(!c.key) {
+                alert("페이지 오류: 참조할 entry 키가 없음");
+                return;
+            }
             const input=row.cells[i].querySelector("input");
 
             if(c.type==="checkbox")
@@ -295,6 +301,7 @@ async function submitAll(){
     }
 
     alert("완료");
+    location.reload();
 }
 
 function updateSums() {
@@ -303,12 +310,12 @@ function updateSums() {
 
     if (rows.length === 0) return;
 
-    const firstInputs = rows[0].querySelectorAll("input[type='number'], input[type='text']");
+    const firstInputs = rows[0].querySelectorAll("input");
     const colCount = firstInputs.length;
     const sum_cols = new Array(colCount).fill(0);
 
     rows.forEach(row => {
-        const inputs = row.querySelectorAll("input[type='number'], input[type='text']");
+        const inputs = row.querySelectorAll("input");
         const sum_row = row.querySelector(".sum_row");
 
         let rowSum = 0;
@@ -326,6 +333,7 @@ function updateSums() {
     const sum_els = document.getElementsByClassName("sum_cols");
     sum_cols.forEach((val, i) => {
         sum_els[i].innerText = val;
+        console.log(val);
     });
 
     const total = sum_cols.reduce((a, b) => a + b, 0);
