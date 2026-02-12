@@ -2,16 +2,9 @@
 webpage for submitting multiple google forms
 
 # how to use
-1. edit FORMID to your google form ID
-```html
-        const FORMID = "";
-```
-2. edit entry # to your google form entry #
-```html
-        const ENTRY = {
-            name: "entry.",
-            bill: "entry.",
-            card: "entry.",
-            cache: "entry."
-        };
-```
+run `makeindex.html` and generate `index.html`
+
+## generation rules
+1. do not create(or delete) *index* type label
+2. the first label must be a *index* type label
+3. the first **entry** label must be a *text* type label
